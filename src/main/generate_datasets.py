@@ -18,17 +18,17 @@ def make_paths_each_place(paths):
     new_paths = []
     for place in places:
         print(place)
-        if 'SFO-1' == place:
-            tmp_paths = []
-            for path in paths:
-                prev_place_path = path.split('US-')[0] # 走行場所より前のpath
-                place_name = path.split('US-')[-1].split('\\')[0] # 走行場所抽出
-                next_place_path = path.split('\\')[2:][0] # 走行場所より後のpath
-                if place == place_name: 
-                    tmp_paths.append(prev_place_path+'US-'+place_name+'/'+next_place_path+'/')
-            if tmp_paths == []:
-                continue
-            new_paths.append(tmp_paths)
+        # if 'SFO-1' == place: #特定のファイルのみ変更したいときに利用
+        tmp_paths = []
+        for path in paths:
+            prev_place_path = path.split('US-')[0] # 走行場所より前のpath
+            place_name = path.split('US-')[-1].split('\\')[0] # 走行場所抽出
+            next_place_path = path.split('\\')[2:][0] # 走行場所より後のpath
+            if place == place_name: 
+                tmp_paths.append(prev_place_path+'US-'+place_name+'/'+next_place_path+'/')
+        if tmp_paths == []:
+            continue
+        new_paths.append(tmp_paths)
     return new_paths
 
 # %%
