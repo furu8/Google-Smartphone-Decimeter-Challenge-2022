@@ -95,6 +95,17 @@ def generate_datasets(paths):
     df['csvfile_num'] = imu_list
 
     display(df)
+    return df
 
-generate_datasets(tr_paths)
-generate_datasets(te_paths)
+tr_df = generate_datasets(tr_paths)
+te_df = generate_datasets(te_paths)
+# %%
+tr_set = set(tr_df.loc[tr_df['csvfile_num']!=0, 'place'])
+te_set = set(te_df.loc[te_df['csvfile_num']!=0, 'place'])
+
+print('all', tr_set | te_set)
+print('train', tr_set)
+print('test', te_set)
+print('tr-te', tr_set-te_set)
+print('te-tr', te_set-tr_set)
+# %%
