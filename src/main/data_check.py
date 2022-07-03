@@ -98,12 +98,3 @@ def generate_datasets(paths):
 
 generate_datasets(tr_paths)
 generate_datasets(te_paths)
-
-# %%
-train=['LAX-1','LAX-2','LAX-3','LAX-5','MTV-1','MTV-2','MTV-3','SFO-1','SFO-2',
-'SJC-1','SJC-2','SVL-1','SVL-2']
-test=['LAX-1','LAX-3','LAX-5','MTV-1','MTV-2','OAK-1','OAK-2','SJC-1','SJC-2',
-'SVL-2']
-
-print(set(train)-set(test))
-print(set(test)-set(train))
