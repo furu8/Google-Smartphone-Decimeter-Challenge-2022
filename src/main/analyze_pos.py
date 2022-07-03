@@ -8,20 +8,6 @@ import plotly
 import plotly.express as px
 DATA_PATH = 'D:/OpenData/Kaggle/smartphone-decimeter-2022'
 
-# %%
-def calc_haversine(lat1, lon1, lat2, lon2):
-    """Calculates the great circle distance between two points
-    on the earth. Inputs are array-like and specified in decimal degrees.
-    """
-    RADIUS = 6_367_000
-    lat1, lon1, lat2, lon2 = map(np.radians, [lat1, lon1, lat2, lon2])
-    dlat = lat2 - lat1
-    dlon = lon2 - lon1
-    a = np.sin(dlat/2)**2 + \
-        np.cos(lat1) * np.cos(lat2) * np.sin(dlon/2)**2
-    dist = 2 * RADIUS * np.arcsin(a**0.5)
-    return dist
-
 def visualize_trafic(df, center, zoom=9):
     fig = px.scatter_mapbox(df,
                             # Here, plotly gets, (x,y) coordinates
@@ -49,7 +35,27 @@ def visualize_collection(df, collection):
 def read_gt(place):
     return pd.read_csv(f'{DATA_PATH}/shilver/train/{place}_gt.csv')
 
+def read_pred(place, name):
+    df = pd.read_csv(f'{DATA_PATH}/submission/{name}.csv')
+    return df[df['tripId'].str.contains(place)]
+
 # %%
+def all_place_visualize(places, name=None):
+    for place in places:
+        if name is None:
+            df = read_gt(place)
+        else:
+            df = read_pred(place, name)
+            df['collectionName'] = df['tripId'].str.split('/', expand=True)[0]
+            df['phoneName'] = df['tripId'].str.split('/', expand=True)[1]
+        
+        print(len(df['collectionName'].unique()))
+        for collection in df['collectionName'].unique():
+            print(collection)
+            visualize_collection(df, collection)
+
+# %%[markdown]
+# ## train
 """各placeのデータ数参考
 place	csvfile_num
 LAX-1       8
@@ -70,28 +76,62 @@ SVL-2       2
 """
 
 # %%
-places = [
-    'LAX-1',
-    'LAX-2', # testにない
-    'LAX-3',
-    'LAX-5',
-    'MTV-1',
-    'MTV-2',
-    'MTV-3', # testにない
-    'SFO-1', # testにない
-    'SFO-2', # testにない
-    'SJC-1',
-    'SJC-2',
-    'SVL-1', # testにない
-    'SVL-2'
+tr_places = [
+    # 'LAX-1',
+    # 'LAX-2', # testにない
+    # 'LAX-3',
+    # 'LAX-5',
+    # 'MTV-1',
+    # 'MTV-2',
+    # 'MTV-3', # testにない
+    # 'SFO-1', # testにない
+    # 'SFO-2', # testにない
+    # 'SJC-1',
+    # 'SJC-2',
+    # 'SVL-1', # testにない
+    # 'SVL-2'
 ]
 # %%
-def all_place_visualize():
-    for place in places:
-        df = read_gt(place)
-        print(len(df['collectionName'].unique()))
-        for collection in df['collectionName'].unique():
-            print(collection)
-            visualize_collection(df, collection)
+# train
+all_place_visualize(tr_places)
+
+# %%[markdown]
+# ## test
+"""各placeのデータ数参考
+place	csvfile_num
+LAX-1	    4
+LAX-2	    0
+LAX-3	    4
+LAX-5	    2
+MTV-1	    14
+MTV-2	    2
+MTV-3	    0
+OAK-1	    2
+OAK-2	    2
+SFO-1	    0
+SFO-2	    0
+SJC-1	    4
+SJC-2	    1
+SVL-1	    0
+SVL-2	    1
+"""
+
 # %%
-all_place_visualize()
+te_places = [
+    # 'LAX-1',
+    # 'LAX-3',
+    # 'LAX-5',
+    # 'MTV-1',
+    # 'MTV-2',
+    # 'OAK-1',
+    # 'OAK-2',
+    # 'SJC-1',
+    # 'SJC-2',
+    # 'SVL-2'
+]
+
+# %%
+# baseline_saito
+all_place_visualize(te_places, 'baseline_saito')
+
+# %%
