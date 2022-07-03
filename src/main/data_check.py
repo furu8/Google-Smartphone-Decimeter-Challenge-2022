@@ -49,14 +49,15 @@ all_filename = train+test
 print('all:', np.sort(check_phone(all_filename)))
 print('train:', np.sort(check_phone(train)))
 print('test:', np.sort(check_phone(test)))
-print('diff:', np.sort(np.array(list(set(check_phone(train)) - set(check_phone(test))))))
+print('tr-te->diff:', np.sort(np.array(list(set(check_phone(train)) - set(check_phone(test))))))
+print('te-tr->diff:', np.sort(np.array(list(set(check_phone(test)) - set(check_phone(train))))))
 # %%
 # 走行場所ごとのCSVファイル数
 trains = gb.glob(f"{DATA_PATH}/bronze/train/*/*/*")
 tests = gb.glob(f"{DATA_PATH}/bronze/test/*/*/*")
 
 places = [
-    'LAX-1', 'LAX-2', 'LAX-3', 'LAX-5', 'MTV-1', 'MTV-2', 'MTV-3', 'OAK-1', 'OAK-2'
+    'LAX-1', 'LAX-2', 'LAX-3', 'LAX-5', 'MTV-1', 'MTV-2', 'MTV-3', 'OAK-1', 'OAK-2',
  'SFO-1', 'SFO-2', 'SJC-1', 'SJC-2', 'SVL-1', 'SVL-2'
 ]
 
@@ -95,16 +96,14 @@ def generate_datasets(paths):
 
     display(df)
 
-
-        # print(place, len(path))
-    #     gnss_list.append(pd.read_csv(f'{path}/device_gnss.csv'))
-    #     imu_list.append(pd.read_csv(f'{path}/device_imu.csv'))
-    #     gt_list.append(pd.read_csv(f'{path}/ground_truth.csv'))
-    # gnss_df = pd.concat(gnss_list)
-
-    # return gnss_df
-
 generate_datasets(tr_paths)
 generate_datasets(te_paths)
 
 # %%
+train=['LAX-1','LAX-2','LAX-3','LAX-5','MTV-1','MTV-2','MTV-3','SFO-1','SFO-2',
+'SJC-1','SJC-2','SVL-1','SVL-2']
+test=['LAX-1','LAX-3','LAX-5','MTV-1','MTV-2','OAK-1','OAK-2','SJC-1','SJC-2',
+'SVL-2']
+
+print(set(train)-set(test))
+print(set(test)-set(train))
