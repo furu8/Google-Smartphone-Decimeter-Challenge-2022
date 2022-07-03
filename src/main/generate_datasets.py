@@ -1,5 +1,4 @@
 # %%
-from winreg import ConnectRegistry
 import numpy as np 
 import pandas as pd
 import glob as gb
@@ -10,7 +9,7 @@ trains = gb.glob(f"{DATA_PATH}/bronze/train/*/*/*")
 tests = gb.glob(f"{DATA_PATH}/bronze/test/*/*/*")
 
 places = [
-    'LAX-1', 'LAX-2', 'LAX-3', 'LAX-5', 'MTV-1', 'MTV-2', 'MTV-3', 'OAK-1', 'OAK-2'
+    'LAX-1', 'LAX-2', 'LAX-3', 'LAX-5', 'MTV-1', 'MTV-2', 'MTV-3', 'OAK-1', 'OAK-2',
  'SFO-1', 'SFO-2', 'SJC-1', 'SJC-2', 'SVL-1', 'SVL-2'
 ]
 # %%
@@ -18,20 +17,25 @@ places = [
 def make_paths_each_place(paths):
     new_paths = []
     for place in places:
-        tmp_paths = []
-        for path in paths:
-            prev_place_path = path.split('US-')[0] # 走行場所より前のpath
-            place_name = path.split('US-')[-1].split('\\')[0] # 走行場所抽出
-            next_place_path = path.split('\\')[2:][0] # 走行場所より後のpath
-            if place == place_name: 
-                tmp_paths.append(prev_place_path+'US-'+place_name+'/'+next_place_path+'/')
-        new_paths.append(tmp_paths)
+        print(place)
+        if 'SFO-1' == place:
+            tmp_paths = []
+            for path in paths:
+                prev_place_path = path.split('US-')[0] # 走行場所より前のpath
+                place_name = path.split('US-')[-1].split('\\')[0] # 走行場所抽出
+                next_place_path = path.split('\\')[2:][0] # 走行場所より後のpath
+                if place == place_name: 
+                    tmp_paths.append(prev_place_path+'US-'+place_name+'/'+next_place_path+'/')
+            if tmp_paths == []:
+                continue
+            new_paths.append(tmp_paths)
     return new_paths
 
 # %%
 tr_paths = [np.unique(np.array(places_path)) for places_path in make_paths_each_place(trains)]
 te_paths = [np.unique(np.array(places_path)) for places_path in make_paths_each_place(tests)]
-tr_paths[0:5]
+tr_paths
+
 # %%
 # 結合の識別元
 def naming_collection_and_phone(df, path):
@@ -41,7 +45,6 @@ def naming_collection_and_phone(df, path):
     return new_df
 
 def generate_datasets(paths, dir_name):
-    i = 0
     for phone_paths in tqdm(paths):
         concated_gnss_df = pd.DataFrame()
         concated_mag_df = pd.DataFrame()
@@ -49,7 +52,7 @@ def generate_datasets(paths, dir_name):
         concated_gyro_df = pd.DataFrame()
         concated_gt_df = pd.DataFrame()
         for path in phone_paths:
-            print(path)
+
             gnss_df = pd.read_csv(f'{path}/device_gnss.csv')
             gnss_df = naming_collection_and_phone(gnss_df, path)
             concated_gnss_df = pd.concat([concated_gnss_df, gnss_df])
@@ -68,7 +71,9 @@ def generate_datasets(paths, dir_name):
                 gt_df = naming_collection_and_phone(gt_df, path)
                 concated_gt_df = pd.concat([concated_gt_df, gt_df])
  
-
+        if concated_gnss_df.empty:
+            print(phone_paths)
+            break
         place = path.split('US-')[-1].split('/')[0]
 
         concated_gnss_df.to_csv(f'{DATA_PATH}/shilver/{dir_name}/{place}_gnss.csv', index=False)
@@ -88,4 +93,3 @@ generate_datasets(tr_paths, 'train')
 # generate test
 generate_datasets(te_paths, 'test')
 
-# %%
